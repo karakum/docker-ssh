@@ -7,7 +7,6 @@
  */
 import express from 'express';
 import bodyParser from 'body-parser';
-import uuid from 'uuid';
 import bunyan from 'bunyan';
 
 const app = express();
@@ -62,7 +61,7 @@ export default {
         });
 
         app.get('/api/v1/terminal/stream/', function(req, res) {
-            const terminalId = uuid.v4();
+            const terminalId = crypto.randomUUID();
             webLog.info('New terminal session', {terminalId});
             res.setHeader('Connection', 'Transfer-Encoding');
             res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
