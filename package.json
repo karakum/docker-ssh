@@ -18,11 +18,15 @@
     "coffee-script": "~1.10.0",
     "decaffeinate": "^8.1.4",
     "dockerode": "^2.2.9",
-    "eslint": "^9.15.0",
     "express": "~4.13.3",
     "forever": "^0.15.1",
     "ssh2": "~0.4.11",
     "ssh2-connect": "0.0.7",
     "uuid": "~2.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "eslint": "^9.15.0",
+    "globals": "^15.12.0"
   }
 }
