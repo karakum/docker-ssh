@@ -6,16 +6,16 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 export default async function(authType) {
-  switch (authType) {
-    case 'noAuth':
-      return (await import('./noAuthHandler.js')).default;
-    case 'simpleAuth':
-      return (await import('./simpleAuth.js')).default;
-    case 'multiUser':
-      return (await import('./multiUserAuth.js')).default;
-    case 'publicKey':
-      return (await import('./publicKeyAuth.js')).default;
-    default:
-      return null;
-  }
+    switch (authType) {
+        case 'noAuth':
+            return (await import('./noAuthHandler.js')).default;
+        case 'simpleAuth':
+            return (await import('./simpleAuth.js')).default;
+        case 'multiUser':
+            return (await import('./multiUserAuth.js')).default;
+        case 'publicKey':
+            return (await import('./publicKeyAuth.js')).default;
+        default:
+            return null;
+    }
 };

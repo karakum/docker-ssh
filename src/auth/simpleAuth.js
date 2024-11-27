@@ -8,18 +8,18 @@
 import bunyan from 'bunyan';
 import env from '../env.js';
 
-const log     = bunyan.createLogger({name: 'simpleAuth'});
+const log = bunyan.createLogger({name: 'simpleAuth'});
 const username = env.assert('AUTH_USER');
 const password = env.assert('AUTH_PASSWORD');
 
 export default function(ctx) {
-  if (ctx.method === 'password') {
-    if ((ctx.username === username) && (ctx.password === password)) {
-      log.info({user: username}, 'Authentication succeeded');
-      return ctx.accept();
-    } else {
-      log.warn({user: ctx.username, password: ctx.password}, 'Authentication failed');
+    if (ctx.method === 'password') {
+        if ((ctx.username === username) && (ctx.password === password)) {
+            log.info({user: username}, 'Authentication succeeded');
+            return ctx.accept();
+        } else {
+            log.warn({user: ctx.username, password: ctx.password}, 'Authentication failed');
+        }
     }
-  }
-  return ctx.reject(['password']);
+    return ctx.reject(['password']);
 };
