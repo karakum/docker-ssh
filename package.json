@@ -12,10 +12,10 @@
   "author": "",
   "license": "GPL-2.0",
   "dependencies": {
-    "buffer-equal-constant-time": "1.0.1",
     "body-parser": "^1.20.3",
+    "buffer-equal-constant-time": "1.0.1",
     "bunyan": "^1.8.15",
-    "dockerode": "^2.2.9",
+    "dockerode": "^4.0.2",
     "express": "^4.21.1",
     "forever": "^0.15.1",
     "ssh2": "~0.4.11",
