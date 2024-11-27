@@ -35,7 +35,7 @@ module.exports = (filters, shell, shell_user) ->
 
       _container = null
 
-      docker.listContainers {filters:filters}, (err, containers) ->
+      docker.listContainers {filters:filters}, (err, containers) -> # FIXME: handle no such container
         containerInfo = containers?[0]
         _containerName = containerInfo?.Names?[0]
         _container = docker.getContainer containerInfo?.Id
