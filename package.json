@@ -14,7 +14,7 @@
   "dependencies": {
     "body-parser": "~1.14.1",
     "buffer-equal-constant-time": "1.0.1",
-    "bunyan": "~1.5.1",
+    "bunyan": "^1.8.15",
     "dockerode": "^2.2.9",
     "express": "~4.13.3",
     "forever": "^0.15.1",
