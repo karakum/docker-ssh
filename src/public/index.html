@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="height:100%; !important;">
+<html style="height:100%; !important;" lang="en">
 <head>
   <title>Docker-SSH</title>
   <script src="/js/jquery-1.11.3.min.js"></script>
@@ -9,24 +9,21 @@
 <body>
 
   <script type="text/javascript">
-    computeMaxTerminalSize = function(){
-      rows = Math.round($(window).height() / 14);
-      cols = Math.round($(window).width() / 6.8);
-      return {cols: cols, rows: rows};
-    };
+    computeMaxTerminalSize = () => ({
+      cols: Math.round($(window).width() / 6.8),
+      rows: Math.round($(window).height() / 14),
+    });
 
-    var connectionId, doneResizing, evt, term;
-    connectionId = null;
-    termSize = computeMaxTerminalSize()
-    term = new Terminal({
+    let connectionId = null;
+    const termSize = computeMaxTerminalSize()
+    const term = new Terminal({
       cols: termSize.cols,
       rows: termSize.rows,
       useStyle: true,
       screenKeys: true,
-      cursorBlink: true
+      cursorBlink: true,
     });
-
-    evt = new EventSource("/api/v1/terminal/stream/");
+    const evt = new EventSource('/api/v1/terminal/stream/');
     evt.addEventListener('connectionId', function(event) {
       connectionId = event.data;
       term.write("Connection established\r\n");
@@ -54,12 +51,12 @@
     });
     term.open(document.body);
 
-    window.onresize = function(event) {
+    window.onresize = function() {
       clearTimeout(this.id);
       this.id = setTimeout(doneResizing, 500);
     };
-    doneResizing = function() {
-      maxTermSize = computeMaxTerminalSize();
+    const doneResizing = function() {
+      const maxTermSize = computeMaxTerminalSize();
       $.post(
         "/api/v1/terminal/resize-window/" + connectionId,
         maxTermSize,

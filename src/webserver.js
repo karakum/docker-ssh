@@ -47,7 +47,7 @@ export default {
             });
 
             return {
-                once(cmd, cb) {
+                once() {
                 },
                 on(event, cb) {
                     switch (event) {

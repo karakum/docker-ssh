@@ -15,7 +15,7 @@ const tuples = env.assert('AUTH_TUPLES');
 
 const security = {};
 
-for (var tuple of Array.from(tuples.split(';'))) {
+for (const tuple of Array.from(tuples.split(';'))) {
     [user, password] = Array.from(tuple.split(':'));
     security[user] = password;
 }

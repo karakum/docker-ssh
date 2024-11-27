@@ -47,7 +47,7 @@ export default (filters, shell, shell_user) => ({
             close() {
                 return stopTerm();
             },
-            handler(accept, reject) {
+            handler(accept) {
                 session = accept();
                 let termInfo = null;
 
@@ -99,7 +99,7 @@ export default (filters, shell, shell_user) => ({
 
                     session.on('err', err => log.error({container: _containerName}, err));
 
-                    session.on('shell', function(accept, reject) {
+                    session.on('shell', function(accept) {
                         log.info({container: _containerName}, 'Opening shell');
                         channel = accept();
                         channel.write(`${header(_containerName)}`);
@@ -160,7 +160,7 @@ export default (filters, shell, shell_user) => ({
                     }); // initially set the current size of the terminal
 
                     session.on('pty', function(accept, reject, info) {
-                        const x = accept();
+                        accept();
                         return termInfo = info;
                     });
 
