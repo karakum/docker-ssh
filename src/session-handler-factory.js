@@ -11,7 +11,7 @@ const log     = bunyan.createLogger({name: 'sessionHandler'});
 
 const docker  = new Docker({socketPath: '/var/run/docker.sock'});
 
-const spaces = (text, length) => (__range__(0, length-text.length, true).map((i) => ' ')).join('');
+const spaces = (text, length) => ' '.repeat((length - text.length) + 1);
 const header = container => "\r\n" +
 " ###############################################################\r\n" +
 " ## Docker SSH ~ Because every container should be accessible ##\r\n" +
@@ -155,13 +155,3 @@ export default (filters, shell, shell_user) => ({
     };
   }
 });
-
-function __range__(left, right, inclusive) {
-  let range = [];
-  let ascending = left < right;
-  let end = !inclusive ? right : ascending ? right + 1 : right - 1;
-  for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
-    range.push(i);
-  }
-  return range;
-}
