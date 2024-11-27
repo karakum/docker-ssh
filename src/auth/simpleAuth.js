@@ -1,15 +1,23 @@
-bunyan  = require 'bunyan'
-log     = bunyan.createLogger name: 'simpleAuth'
-env     = require '../env'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
+ */
+import bunyan from 'bunyan';
+const log     = bunyan.createLogger({name: 'simpleAuth'});
+const env     = require('../env');
 
-username = env.assert 'AUTH_USER'
-password = env.assert 'AUTH_PASSWORD'
+const username = env.assert('AUTH_USER');
+const password = env.assert('AUTH_PASSWORD');
 
-module.exports = (ctx) ->
-  if ctx.method is 'password'
-    if ctx.username is username and ctx.password is password
-      log.info {user: username}, 'Authentication succeeded'
-      return ctx.accept()
-    else
-      log.warn {user: ctx.username, password: ctx.password}, 'Authentication failed'
-  ctx.reject(['password'])
+export default function(ctx) {
+  if (ctx.method === 'password') {
+    if ((ctx.username === username) && (ctx.password === password)) {
+      log.info({user: username}, 'Authentication succeeded');
+      return ctx.accept();
+    } else {
+      log.warn({user: ctx.username, password: ctx.password}, 'Authentication failed');
+    }
+  }
+  return ctx.reject(['password']);
+};

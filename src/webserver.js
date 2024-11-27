@@ -1,73 +1,106 @@
-express     = require 'express'
-bodyParser  = require('body-parser')
-uuid        = require 'uuid'
-app         = express()
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
+ */
+import express from 'express';
+import bodyParser from 'body-parser';
+import uuid from 'uuid';
+const app         = express();
 
-bunyan      = require 'bunyan'
-webLog      = bunyan.createLogger name: 'webserver'
+const bunyan      = require('bunyan');
+const webLog      = bunyan.createLogger({name: 'webserver'});
 
-module.exports =
+export default {
 
-  start: (port, sessionFactory) ->
+  start(port, sessionFactory) {
 
-    app.use express.static 'src/public'
-    app.use bodyParser.urlencoded extended: false
+    let server;
+    app.use(express.static('src/public'));
+    app.use(bodyParser.urlencoded({extended: false}));
 
-    eventHandlers = []
-    addEventHandler = (connectionId, event, cb) ->
-      eventHandlers[connectionId] = {} unless eventHandlers[connectionId]
-      eventHandlers[connectionId][event] = cb
+    const eventHandlers = [];
+    const addEventHandler = function(connectionId, event, cb) {
+      if (!eventHandlers[connectionId]) { eventHandlers[connectionId] = {}; }
+      return eventHandlers[connectionId][event] = cb;
+    };
 
-    webSession = (res, connectionId) -> ->
-      channel = ->
-        write: (data) ->
-          res.write "event: data\n"
-          res.write "data: #{JSON.stringify data}\n\n"
-        on: (event, cb) ->
-          addEventHandler connectionId, "channel:#{event}", cb
-        end: ->
-          webLog.info 'Websession end', connectionId: connectionId
-          delete eventHandlers[connectionId]
-          res.end()
+    const webSession = (res, connectionId) => (function() {
+      const channel = () => ({
+        write(data) {
+          res.write("event: data\n");
+          return res.write(`data: ${JSON.stringify(data)}\n\n`);
+        },
 
-      once: (cmd, cb) ->
-      on: (event, cb) ->
-        switch event
-          when 'shell' then cb channel
-          else addEventHandler connectionId, "session:#{event}", cb
+        on(event, cb) {
+          return addEventHandler(connectionId, `channel:${event}`, cb);
+        },
 
-    app.get '/api/v1/terminal/stream/', (req, res) ->
-      terminalId = uuid.v4()
-      webLog.info 'New terminal session', terminalId: terminalId
-      res.setHeader 'Connection', 'Transfer-Encoding'
-      res.setHeader 'Content-Type', 'text/event-stream; charset=utf-8'
-      res.setHeader 'Transfer-Encoding', 'chunked'
-      res.write 'event: connectionId\n'
-      res.write "data: #{terminalId}\n\n"
-      sessionFactory.instance().handler webSession res, terminalId
+        end() {
+          webLog.info('Websession end', {connectionId});
+          delete eventHandlers[connectionId];
+          return res.end();
+        }
+      });
 
-      res.on 'close', ->
-        eventHandlers[terminalId]['channel:end']()
+      return {
+        once(cmd, cb) {},
+        on(event, cb) {
+          switch (event) {
+            case 'shell': return cb(channel);
+            default: return addEventHandler(connectionId, `session:${event}`, cb);
+          }
+        }
+      };
+    });
 
-    app.post '/api/v1/terminal/send/:terminalId', (req, res) ->
-      terminalId = req.params.terminalId
-      data = req.body.data
-      if eventHandlers[terminalId]['channel:data']
-        eventHandlers[terminalId]['channel:data'] data
-      else
-        webLog.error 'No input handler for connection', connectionId: connectionId
-      res.end()
+    app.get('/api/v1/terminal/stream/', function(req, res) {
+      const terminalId = uuid.v4();
+      webLog.info('New terminal session', {terminalId});
+      res.setHeader('Connection', 'Transfer-Encoding');
+      res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+      res.setHeader('Transfer-Encoding', 'chunked');
+      res.write('event: connectionId\n');
+      res.write(`data: ${terminalId}\n\n`);
+      sessionFactory.instance().handler(webSession(res, terminalId));
 
-    app.post '/api/v1/terminal/resize-window/:terminalId', (req, res) ->
-      terminalId = req.params.terminalId
-      info =
-        rows: parseInt req.body.rows
-        cols: parseInt req.body.cols
-      eventHandlers[terminalId]['session:window-change'] null, null, info
-      res.json info
-      res.end()
+      return res.on('close', () => eventHandlers[terminalId]['channel:end']());
+    });
 
-    server = app.listen port, ->
-      host = server.address().address
-      port = server.address().port
-      webLog.info {host: host, port: port}, 'Listening'
+    app.post('/api/v1/terminal/send/:terminalId', function(req, res) {
+      const {
+        terminalId
+      } = req.params;
+      const {
+        data
+      } = req.body;
+      if (eventHandlers[terminalId]['channel:data']) {
+        eventHandlers[terminalId]['channel:data'](data);
+      } else {
+        webLog.error('No input handler for connection', {connectionId});
+      }
+      return res.end();
+    });
+
+    app.post('/api/v1/terminal/resize-window/:terminalId', function(req, res) {
+      const {
+        terminalId
+      } = req.params;
+      const info = {
+        rows: parseInt(req.body.rows),
+        cols: parseInt(req.body.cols)
+      };
+      eventHandlers[terminalId]['session:window-change'](null, null, info);
+      res.json(info);
+      return res.end();
+    });
+
+    return server = app.listen(port, function() {
+      const host = server.address().address;
+      ({
+        port
+      } = server.address());
+      return webLog.info({host, port}, 'Listening');
+    });
+  }
+};

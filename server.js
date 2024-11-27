@@ -1,58 +1,67 @@
-fs        = require 'fs'
-ssh2      = require 'ssh2'
-bunyan    = require 'bunyan'
-log       = bunyan.createLogger name: 'sshServer'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
+ */
+import fs from 'fs';
+import ssh2 from 'ssh2';
+import bunyan from 'bunyan';
+const log       = bunyan.createLogger({name: 'sshServer'});
 
-webserver       = require './src/webserver'
-handlerFactory  = require './src/session-handler-factory'
+const webserver       = require('./src/webserver');
+const handlerFactory  = require('./src/session-handler-factory');
 
-sshPort         = process.env.PORT or 22
-httpPort        = process.env.HTTP_PORT or 80
-httpEnabled     = process.env.HTTP_ENABLED or true
-ip              = process.env.IP or '0.0.0.0'
-keypath         = process.env.KEYPATH
-filters         = process.env.FILTERS
-container       = process.env.CONTAINER
-shell           = process.env.CONTAINER_SHELL
-shell_user      = process.env.SHELL_USER
-authMechanism   = process.env.AUTH_MECHANISM
-authenticationHandler = require('./src/auth') authMechanism
+const sshPort         = process.env.PORT || 22;
+const httpPort        = process.env.HTTP_PORT || 80;
+let httpEnabled     = process.env.HTTP_ENABLED || true;
+const ip              = process.env.IP || '0.0.0.0';
+const keypath         = process.env.KEYPATH;
+let filters         = process.env.FILTERS;
+const container       = process.env.CONTAINER;
+const shell           = process.env.CONTAINER_SHELL;
+const shell_user      = process.env.SHELL_USER;
+const authMechanism   = process.env.AUTH_MECHANISM;
+const authenticationHandler = require('./src/auth')(authMechanism);
 
-httpEnabled = httpEnabled == 'true' || httpEnabled == true
+httpEnabled = (httpEnabled === 'true') || (httpEnabled === true);
 
-exitOnConfigError = (errorMessage) ->
-  console.error "Configuration error: #{errorMessage}"
-  process.exit(1)
+const exitOnConfigError = function(errorMessage) {
+  console.error(`Configuration error: ${errorMessage}`);
+  return process.exit(1);
+};
 
-exitOnConfigError 'No FILTERS specified'                      unless filters or container
-exitOnConfigError 'No KEYPATH specified'                      unless keypath
-exitOnConfigError 'No CONTAINER_SHELL specified'              unless shell
-exitOnConfigError 'No AUTH_MECHANISM specified'               unless authMechanism
-exitOnConfigError "Unknown AUTH_MECHANISM: #{authMechanism}"  unless authenticationHandler
+if (!filters && !container) { exitOnConfigError('No FILTERS specified'); }
+if (!keypath) { exitOnConfigError('No KEYPATH specified'); }
+if (!shell) { exitOnConfigError('No CONTAINER_SHELL specified'); }
+if (!authMechanism) { exitOnConfigError('No AUTH_MECHANISM specified'); }
+if (!authenticationHandler) { exitOnConfigError(`Unknown AUTH_MECHANISM: ${authMechanism}`); }
 
-options =
-  privateKey: fs.readFileSync keypath
+const options =
+  {privateKey: fs.readFileSync(keypath)};
 
-# support CONTAINER parameter for backwards compatibility
-# Apparently the name filter also matches on partial names
-# It turns out the name filter accepts a regular expression to do an exact match
-# See: https://forums.docker.com/t/how-to-filter-docker-ps-by-exact-name/2880
-filters = {"name":["^/#{container}$"]} if (not filters) and container
-log.info filter: filters, 'Docker filter'
+// support CONTAINER parameter for backwards compatibility
+// Apparently the name filter also matches on partial names
+// It turns out the name filter accepts a regular expression to do an exact match
+// See: https://forums.docker.com/t/how-to-filter-docker-ps-by-exact-name/2880
+if ((!filters) && container) { filters = {"name":[`^/${container}$`]}; }
+log.info({filter: filters}, 'Docker filter');
 
-sessionFactory = handlerFactory filters, shell, shell_user
+const sessionFactory = handlerFactory(filters, shell, shell_user);
 
-sshServer = new ssh2.Server options, (client, info) ->
-  session = sessionFactory.instance()
-  log.info clientIp: info.ip, 'Client connected'
-  client.on 'authentication', authenticationHandler
-  client.on 'ready', -> client.on('session', session.handler)
-  client.on 'end', ->
-    log.info clientIp: info.ip, 'Client disconnected'
-    session.close()
+const sshServer = new ssh2.Server(options, function(client, info) {
+  const session = sessionFactory.instance();
+  log.info({clientIp: info.ip}, 'Client connected');
+  client.on('authentication', authenticationHandler);
+  client.on('ready', () => client.on('session', session.handler));
+  return client.on('end', function() {
+    log.info({clientIp: info.ip}, 'Client disconnected');
+    return session.close();
+  });
+});
 
-sshServer.listen sshPort, ip, ->
-  log.info 'Docker-SSH ~ Because every container should be accessible'
-  log.info {host: @address().address, port: @address().port}, 'Listening'
+sshServer.listen(sshPort, ip, function() {
+  log.info('Docker-SSH ~ Because every container should be accessible');
+  return log.info({host: this.address().address, port: this.address().port}, 'Listening');
+});
 
-webserver.start httpPort, sessionFactory if httpEnabled
+if (httpEnabled) { webserver.start(httpPort, sessionFactory); }
