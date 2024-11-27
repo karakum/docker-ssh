@@ -159,7 +159,7 @@ Supports the authentication of a user against an authorized_keys file containing
 Set `AUTH_MECHANISM=publicKey` to enable this authentication mechanism.
 The name of the authorized_keys file is configured by setting `AUTHORIZED_KEYS`.
 
-    $ cat ~/.ssh/id_rsa.pub > authorized_keys
+    $ cat ~/.ssh/id_ed25519.pub > authorized_keys
     $ docker run -d -p 2222:22 \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -v ./authorized_keys:/authorized_keys
@@ -192,23 +192,23 @@ The SSH server needs an RSA/EC private key in order to secure the connection and
 The Docker-SSH container comes with a default RSA key that will be used. If you want, you can provide your own
 key. Simply provide a key file as a volume to the container and set the *KEYPATH* argument of the container.
 Example: `-v /path/to/my/key:/my_key -e KEYPATH=/my_key`. It is also possible to overwrite the existing key file.
-In that case you can omit the `KEYPATH` argument. Example: `-v /path/to/my/key:/usr/src/app/id_rsa.pub`
+In that case you can omit the `KEYPATH` argument. Example: `-v /path/to/my/key:/usr/src/app/id_ed25519.pub`
 
 # Arguments
 Arguments to Docker-SSH are passed as Docker environment variables. Docker-SSH needs at least the *CONTAINER*
 argument in order to know for which container to provide SSH. Mounting the Docker socket into the SSH container is mandatory since Docker-SSH internally uses *docker exec* to create a shell session.
 
-Argument       | Default  | Description
----------------|----------|------------------------------------------------------
-FILTERS        | None     | Docker filter to target a container
-CONTAINER      | None     | *name* of a running container. **deprecated**, use FILTER
-CONTAINER_SHELL| bash     | path to a shell.
-AUTH_MECHANISM | None     | name of the authentication mechanism, see [User Authentication](#user-authentication)
-KEYPATH        | ./id_rsa | path to a private key to use as server identity
-PORT           | 22       | ssh server listens on this port
-HTTP_ENABLED   | true     | enable/disable the web terminal
-HTTP_PORT      | 8022     | web terminal listens on this port
-SHELL_USER     | root     | Run commands as this user *(Note: independent from authentication user)*
+Argument       | Default      | Description
+---------------|--------------|------------------------------------------------------
+FILTERS        | None         | Docker filter to target a container
+CONTAINER      | None         | *name* of a running container. **deprecated**, use FILTER
+CONTAINER_SHELL| bash         | path to a shell.
+AUTH_MECHANISM | None         | name of the authentication mechanism, see [User Authentication](#user-authentication)
+KEYPATH        | ./id_ed25519 | path to a private key to use as server identity
+PORT           | 22           | ssh server listens on this port
+HTTP_ENABLED   | true         | enable/disable the web terminal
+HTTP_PORT      | 8022         | web terminal listens on this port
+SHELL_USER     | root         | Run commands as this user *(Note: independent from authentication user)*
 
 # Credits
 I couldn't have created Docker-SSH without the following great Node packages! Many thanks go to the authors of:

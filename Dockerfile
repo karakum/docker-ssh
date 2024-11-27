@@ -20,7 +20,7 @@ ENV CONTAINER=""
 ENV CONTAINER_SHELL=bash
 
 # Server key
-ENV KEYPATH=./id_rsa
+ENV KEYPATH=./id_ed25519
 
 # Server port
 ENV PORT=22

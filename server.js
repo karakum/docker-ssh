@@ -48,8 +48,9 @@ if (!authenticationHandler) {
     exitOnConfigError(`Unknown AUTH_MECHANISM: ${authMechanism}`);
 }
 
-const options =
-    {privateKey: fs.readFileSync(keypath)};
+const options = {
+    hostKeys: [fs.readFileSync(keypath)],
+};
 
 // support CONTAINER parameter for backwards compatibility
 // Apparently the name filter also matches on partial names
