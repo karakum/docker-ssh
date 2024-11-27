@@ -30,10 +30,10 @@ export default (filters, shell, shell_user) => ({
         session = null;
 
         const closeChannel = function() {
-            if (channel) {
+            if (channel.exit) {
                 channel.exit(0);
             }
-            if (channel) {
+            if (channel.end) {
                 return channel.end();
             }
         };

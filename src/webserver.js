@@ -71,7 +71,7 @@ export default {
             sessionFactory.instance()
                 .handler(webSession(res, terminalId));
 
-            return res.on('close', () => eventHandlers[terminalId]['channel:end']());
+            return res.on('close', () => eventHandlers?.[terminalId]?.['channel:end']?.());
         });
 
         app.post('/api/v1/terminal/send/:terminalId', function(req, res) {
