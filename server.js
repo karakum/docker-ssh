@@ -8,11 +8,11 @@
 import fs from 'fs';
 import ssh2 from 'ssh2';
 import bunyan from 'bunyan';
+import authHandlerFactory from './src/auth/index.js';
+import webserver from './src/webserver.js';
+import sessionHandlerFactory from './src/session-handler-factory.js';
+
 const log       = bunyan.createLogger({name: 'sshServer'});
-
-const webserver       = require('./src/webserver');
-const handlerFactory  = require('./src/session-handler-factory');
-
 const sshPort         = process.env.PORT || 22;
 const httpPort        = process.env.HTTP_PORT || 80;
 let httpEnabled     = process.env.HTTP_ENABLED || true;
@@ -23,7 +23,7 @@ const container       = process.env.CONTAINER;
 const shell           = process.env.CONTAINER_SHELL;
 const shell_user      = process.env.SHELL_USER;
 const authMechanism   = process.env.AUTH_MECHANISM;
-const authenticationHandler = require('./src/auth')(authMechanism);
+const authenticationHandler = await authHandlerFactory(authMechanism);
 
 httpEnabled = (httpEnabled === 'true') || (httpEnabled === true);
 
@@ -48,7 +48,7 @@ const options =
 if ((!filters) && container) { filters = {"name":[`^/${container}$`]}; }
 log.info({filter: filters}, 'Docker filter');
 
-const sessionFactory = handlerFactory(filters, shell, shell_user);
+const sessionFactory = sessionHandlerFactory(filters, shell, shell_user);
 
 const sshServer = new ssh2.Server(options, function(client, info) {
   const session = sessionFactory.instance();

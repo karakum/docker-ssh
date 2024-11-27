@@ -8,9 +8,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import uuid from 'uuid';
-const app         = express();
+import bunyan from 'bunyan';
 
-const bunyan      = require('bunyan');
+const app         = express();
 const webLog      = bunyan.createLogger({name: 'webserver'});
 
 export default {

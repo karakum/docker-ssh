@@ -8,9 +8,9 @@
  */
 let password, user;
 import bunyan from 'bunyan';
-const log     = bunyan.createLogger({name: 'multiUserAuth'});
-const env     = require('../env');
+import env from '../env.js';
 
+const log     = bunyan.createLogger({name: 'multiUserAuth'});
 const tuples = env.assert('AUTH_TUPLES');
 
 const security = {};

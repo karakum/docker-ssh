@@ -1,16 +1,20 @@
-FROM node:9-onbuild as build
+ARG NODE_VERSION=22
 
-CMD ["npm", "start"]
+FROM node:${NODE_VERSION}-alpine AS build
 
-FROM alpine:3.6
-COPY --from=build /usr/src/app /usr/src/app
+WORKDIR /usr/src/app
 
-RUN apk update \
-  && apk add nodejs nodejs-npm \
-  && rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp
+ENV NODE_ENV=production
+
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev
+
+COPY . .
 
 # Connect to container with name/id
-ENV CONTAINER=
+ENV CONTAINER=""
 
 # Shell to use inside the container
 ENV CONTAINER_SHELL=bash
@@ -29,5 +33,4 @@ ENV HTTP_PORT=8022
 
 EXPOSE 22 8022
 
-WORKDIR /usr/src/app
 CMD ["npm", "start"]

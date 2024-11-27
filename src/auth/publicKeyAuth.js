@@ -6,14 +6,14 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 import bunyan from 'bunyan';
-const log      = bunyan.createLogger({name: 'publicKeyAuth'});
-const env      = require('../env');
-const fs       = require('fs');
-const crypto   = require('crypto');
-const ssh2     = require('ssh2');
-const ssh2_streams = require('ssh2-streams');
-const buffersEqual = require('buffer-equal-constant-time');
+import buffersEqual from 'buffer-equal-constant-time';
+import ssh2_streams from 'ssh2-streams';
+import ssh2 from 'ssh2';
+import crypto from 'crypto';
+import fs from 'fs';
+import env from '../env.js';
 
+const log      = bunyan.createLogger({name: 'publicKeyAuth'});
 const authorizedKeysFile = env.assert('AUTHORIZED_KEYS');
 
 export default function(ctx) {

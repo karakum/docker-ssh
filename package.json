@@ -5,9 +5,10 @@
   "repository": "https://github.com/jeroenpeeters/docker-ssh",
   "main": "server.coffee",
   "scripts": {
-    "start": "./node_modules/forever/bin/forever -c ./node_modules/coffee-script/bin/coffee server.coffee | ./node_modules/bunyan/bin/bunyan",
+    "start": "./node_modules/forever/bin/forever server.js | ./node_modules/bunyan/bin/bunyan",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "type": "module",
   "author": "",
   "license": "GPL-2.0",
   "dependencies": {
@@ -20,6 +21,7 @@
     "dockerode": "^2.2.9",
     "express": "~4.13.3",
     "forever": "^0.15.1",
+    "jscodeshift": "^17.1.1",
     "ssh2": "~0.4.11",
     "ssh2-connect": "0.0.7",
     "uuid": "~2.0.1"

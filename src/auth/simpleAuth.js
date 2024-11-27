@@ -6,9 +6,9 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 import bunyan from 'bunyan';
-const log     = bunyan.createLogger({name: 'simpleAuth'});
-const env     = require('../env');
+import env from '../env.js';
 
+const log     = bunyan.createLogger({name: 'simpleAuth'});
 const username = env.assert('AUTH_USER');
 const password = env.assert('AUTH_PASSWORD');
 
