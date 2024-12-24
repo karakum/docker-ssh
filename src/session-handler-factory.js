@@ -12,7 +12,7 @@ const log = bunyan.createLogger({name: 'sessionHandler'});
 
 const docker = new Docker({socketPath: '/var/run/docker.sock'});
 
-const spaces = (text, length) => ' '.repeat((length - text.length) + 1);
+const spaces = (text, length) => ' '.repeat(Math.max(0, length - text.length) + 1);
 const header = container => '\r\n' +
     ' ###############################################################\r\n' +
     ' ## Docker SSH ~ Because every container should be accessible ##\r\n' +

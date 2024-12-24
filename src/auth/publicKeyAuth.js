@@ -27,8 +27,8 @@ export default function(ctx) {
             .forEach(function(line) {
                 authorizedKeyIndex++;
                 if (line.length > 0) {
-                    const pubKey = ssh2_streams.utils.genPublicKey(ssh2_streams.utils.parseKey(line));
-                    if ((ctx.key.algo === pubKey.fulltype) && buffersEqual(ctx.key.data, pubKey.public)) {
+                    const pubKey = ssh2_streams.utils.parseKey(line);
+                    if ((ctx.key.algo === pubKey.type) && buffersEqual(ctx.key.data, pubKey.getPublicSSH())) {
                         log.info('Found authorized key matching client key at ' + authorizedKeysFile + ':' + authorizedKeyIndex);
                         return authorizedKey = pubKey;
                     }
@@ -41,15 +41,15 @@ export default function(ctx) {
             return ctx.reject();
         }
 
-        if (ctx.signature) {
+        if (ctx.signature && ctx.sigAlgo) {
             const verifier = crypto.createVerify(ctx.sigAlgo);
             verifier.update(ctx.blob);
-            if (verifier.verify(authorizedKey.publicOrig, ctx.signature)) {
+            if (verifier.verify(authorizedKey.getPublicSSH(), ctx.signature)) {
                 log.info({user: ctx.username}, 'Public key auth succeeded');
                 return ctx.accept();
             } else {
                 log.warn({user: ctx.username}, 'Authentication failed');
-                ctx.reject();
+                return ctx.reject();
             }
         } else {
             // if no signature present, that means the client is just checking
