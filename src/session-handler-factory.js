@@ -21,7 +21,7 @@ const header = container => '\r\n' +
     ' ###############################################################\r\n' +
     '\r\n';
 
-export default (filters, shell, shell_user) => ({
+export default (filters, shell, shell_user, shell_prompt) => ({
     instance() {
         let session = null;
         let channel = null;
@@ -140,7 +140,11 @@ export default (filters, shell, shell_user) => ({
                                 });
 
                                 stream.write('export TERM=linux;\n');
-                                stream.write('export PS1="\\w $ ";\n\n');
+                                if (shell_prompt) {
+                                    stream.write('export PS1="' + shell_prompt + '";\n\n');
+                                } else {
+                                    stream.write('export PS1="\\w $ ";\n\n');
+                                }
 
                                 channel.on('data', data => stream.write(data));
                                 channel.on('error', e => log.error({container: _containerName}, 'Channel error', e));

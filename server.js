@@ -22,6 +22,7 @@ let filters = process.env.FILTERS;
 const container = process.env.CONTAINER;
 const shell = process.env.CONTAINER_SHELL;
 const shell_user = process.env.SHELL_USER;
+const shell_prompt = process.env.CONTAINER_SHELL_PROMPT || false;
 const authMechanism = process.env.AUTH_MECHANISM;
 const authenticationHandler = await authHandlerFactory(authMechanism);
 
@@ -61,7 +62,7 @@ if ((!filters) && container) {
 }
 log.info({filter: filters}, 'Docker filter');
 
-const sessionFactory = sessionHandlerFactory(filters, shell, shell_user);
+const sessionFactory = sessionHandlerFactory(filters, shell, shell_user, shell_prompt);
 
 const sshServer = new ssh2.Server(options, function(client, info) {
     const session = sessionFactory.instance();
